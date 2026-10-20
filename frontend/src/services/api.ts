@@ -1,6 +1,8 @@
 import type { User, Conversation, Message, ContactRequest, UserSearchResult } from '../types';
 
-const API_BASE = '/api';
+// Backend address. Empty = same site (local dev / docker). Set VITE_API_URL when the backend is hosted elsewhere (e.g. Render).
+export const API_ORIGIN: string = (import.meta.env.VITE_API_URL ?? '').replace(/\/+$/, '');
+const API_BASE = `${API_ORIGIN}/api`;
 
 export function getAuthToken(): string | null {
   return localStorage.getItem('connectnow_token');
@@ -180,6 +182,11 @@ export const api = {
       throw new Error(msg);
     }
 
-    return response.json();
+    const data = await response.json();
+    // Uploaded files are served by the backend, so make their URL absolute when the backend is on another host.
+    if (typeof data.fileUrl === 'string' && data.fileUrl.startsWith('/')) {
+      data.fileUrl = `${API_ORIGIN}${data.fileUrl}`;
+    }
+    return data;
   },
 };
