@@ -1,7 +1,7 @@
 import { Client } from '@stomp/stompjs';
 import type { IMessage, StompSubscription } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
-import { getAuthToken } from './api';
+import { getAuthToken, API_ORIGIN } from './api';
 
 class WebSocketService {
   private client: Client | null = null;
@@ -20,7 +20,7 @@ class WebSocketService {
     }
 
     // Determine WS / SockJS endpoint
-    const socketFactory = () => new SockJS('/ws');
+    const socketFactory = () => new SockJS(`${API_ORIGIN}/ws`);
 
     this.client = new Client({
       webSocketFactory: socketFactory,
